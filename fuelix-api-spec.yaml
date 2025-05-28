@@ -1,0 +1,2228 @@
+openapi: '3.0.0'
+info:
+  title: 'Consolidated API Specification'
+  description: 'Combined API specification including Basic LLM, Core, and Cloud Functions'
+  version: '1.0.0'
+  contact: {}
+
+servers:
+  - url: 'https://api-beta.fuelix.ai'
+
+security:
+  - BearerAuth: []
+
+paths:
+  /chat/completions:
+    post:
+      operationId: 'ChatCompletionsController_create'
+      summary: 'Create a chat completion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Chat Completions'
+  /v1/chat/completions:
+    post:
+      summary: 'Create a chat completion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Chat Completions'
+  /v1/audio/transcriptions:
+    post:
+      operationId: 'AudioTranscriptionsController_create'
+      summary: 'Create an audio transcription'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: 'object'
+              properties:
+                file:
+                  type: 'string'
+                  format: 'binary'
+      responses:
+        '200':
+          description: 'Successful Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Audio Transcriptions'
+
+  /embeddings:
+    post:
+      operationId: 'EmbeddingsController_create'
+      summary: 'Create embeddings'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmbeddingRequest'
+      responses:
+        '200':
+          description: 'Successful Response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmbeddingResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Embeddings'
+
+  /v1/images/generations:
+    post:
+      operationId: 'ImageGenerationsV1Controller_create'
+      summary: 'Create image generations (v1)'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageGenerationV1Request'
+      responses:
+        '200':
+          description: 'Successful Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Image Generations V1'
+
+  /v1/audio/speech:
+    post:
+      operationId: 'AudioSpeechController_create'
+      summary: 'Create audio speech'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AudioSpeechRequest'
+      responses:
+        '200':
+          description: 'Successful Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Audio Speech'
+
+  /images/generations:
+    post:
+      operationId: 'ImageGenerationsController_create'
+      summary: 'Create image generations'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageGenerationRequest'
+      responses:
+        '200':
+          description: 'Successful Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Image Generations'
+
+  /health:
+    get:
+      operationId: 'HealthController_check'
+      summary: 'Check system health'
+      responses:
+        '200':
+          description: 'The Health Check is successful'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+        '503':
+          description: 'The Health Check is not successful'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckErrorResponse'
+      tags:
+        - 'Health'
+
+  /threads/runs:
+    post:
+      operationId: 'ThreadsController_run'
+      summary: 'Create thread and run'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadRunRequest'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadRunResponse'
+      tags:
+        - 'Threads'
+  /v1/threads/runs:
+    post:
+      summary: 'Create thread and run'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadRunRequest'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadRunResponse'
+      tags:
+        - 'Threads'
+  /organizations/{id}:
+    get:
+      operationId: 'OrganizationsController_getById'
+      summary: 'Get organization by id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Organization found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Organization not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Organizations'
+
+  /copilots/{id}/generation:
+    post:
+      operationId: 'CopilotsController_generate'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopilotGenerationViewModel'
+      responses:
+        '200':
+          description: 'Copilot generation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Copilots'
+
+  /knowledge-bases:
+    post:
+      operationId: 'KnowledgeBasesController_create'
+      summary: 'Create knowledge base'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseUpsertViewModel'
+      responses:
+        '201':
+          description: 'Knowledge base created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+    get:
+      operationId: 'KnowledgeBasesController_getAll'
+      summary: 'Get knowledge base list and filter by scope'
+      parameters:
+        - name: scope
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Data found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+
+  /knowledge-bases/search:
+    post:
+      operationId: 'KnowledgeBasesController_search'
+      summary: 'Search on knowledge base access'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseSearchViewModel'
+      responses:
+        '200':
+          description: 'Knowledge base search data'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeBaseSearchResponseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: 'Knowledge base is forbidden'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailsResponse'
+        '404':
+          description: 'Knowledge base not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+
+  /knowledge-bases/{id}:
+    put:
+      operationId: 'KnowledgeBasesController_update'
+      summary: 'Update knowledge base'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseUpsertViewModel'
+      responses:
+        '201':
+          description: 'Knowledge base updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+    get:
+      operationId: 'KnowledgeBasesController_getOneBy'
+      summary: 'Get knowledge base by id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Data found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+    delete:
+      operationId: 'KnowledgeBasesController_delete'
+      summary: 'Delete knowledge base'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Knowledge base deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+
+  /knowledge-bases/{id}/documents:
+    get:
+      operationId: 'KnowledgeBasesController_getDocumentsByKnowledgeBase'
+      summary: 'List documents from a knowledge base'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'List of documents'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentsViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+
+  /knowledge-bases/{id}/upload-url:
+    get:
+      operationId: 'KnowledgeBasesController_getUploadUrl'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fileName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Upload URL'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Knowledge Bases'
+
+  '/v1/files':
+    post:
+      operationId: FilesController_uploadFile
+      summary: Upload file
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              '$ref': '#/components/schemas/FilesCreateViewModel'
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/FilesViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Files
+    get:
+      operationId: FilesController_listFiles
+      summary: Returns a list of file objects
+      parameters: []
+      responses:
+        '200':
+          description: List of file objects
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/FilesViewModelList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Files
+  '/v1/files/{id}':
+    get:
+      operationId: FilesController_retrieveFile
+      summary: Returns a file object
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: file object of the specified file
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/FilesViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Files
+    delete:
+      operationId: FilesController_deleteFile
+      summary: Deletes a file
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: file deletion status
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/FilesDeleteModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Files
+  '/v1/vector_stores':
+    post:
+      operationId: VectorStoresController_create
+      summary: Create vector store
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the vector store.
+                file_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: A list of File IDs that the vector store should use.
+                  default: []
+                expires_after:
+                  type: object
+                  description: Expiration policy for the vector store.
+                chunking_strategy:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - static
+                        - auto
+                      description: Type of chunking strategy. Can be "static" or "auto".
+                    static:
+                      type: object
+                      properties:
+                        max_chunk_size_tokens:
+                          type: number
+                          description: Maximum chunk size in tokens. Must be between
+                            100 and 4096.
+                        chunk_overlap_tokens:
+                          type: number
+                          description: Number of overlapping tokens between chunks.
+                            Must be non-negative and less than half of max_chunk_size_tokens.
+                      description: Static chunking strategy settings. Only required
+                        if type is "static".
+                      nullable: true
+                  description: Chunking strategy for files.
+                metadata:
+                  type: object
+                  description: Set of metadata key-value pairs.
+      responses:
+        '201':
+          description: Vector store created
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+    get:
+      operationId: VectorStoresController_getAll
+      summary: Get vector store list
+      parameters: []
+      responses:
+        '200':
+          description: Data found
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreViewModelList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+  '/v1/vector_stores/{id}':
+    get:
+      operationId: VectorStoresController_getOneBy
+      summary: Get vector store by id
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data found
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+    post:
+      operationId: VectorStoresController_update
+      summary: Update vector store
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the vector store.
+                expires_after:
+                  type: object
+                  description: Expiration policy for the vector store.
+                metadata:
+                  type: object
+                  description: Set of metadata key-value pairs.
+      responses:
+        '201':
+          description: Vector store updated
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+    delete:
+      operationId: VectorStoresController_delete
+      summary: Delete vector store
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vector store deleted
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreDeleteViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+  '/v1/vector_stores/{id}/files':
+    post:
+      operationId: VectorStoresController_addFiles
+      summary: Add a file to a vector store
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file_id:
+                  type: string
+                  description: A list of File IDs that the vector store should use.
+                chunking_strategy:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - static
+                        - auto
+                      description: Type of chunking strategy. Can be "static" or "auto".
+                    static:
+                      type: object
+                      properties:
+                        max_chunk_size_tokens:
+                          type: number
+                          description: Maximum chunk size in tokens. Must be between
+                            100 and 4096.
+                        chunk_overlap_tokens:
+                          type: number
+                          description: Number of overlapping tokens between chunks.
+                            Must be non-negative and less than half of max_chunk_size_tokens.
+                      description: Static chunking strategy settings. Only required
+                        if type is "static".
+                      nullable: true
+                  description: Chunking strategy for files.
+      responses:
+        '201':
+          description: ''
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+    get:
+      operationId: VectorStoresController_getFiles
+      summary: Returns a list of vector store files.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of vector store file objects.
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreFilesViewModelList'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+  '/v1/vector_stores/{id}/files/{file_id}':
+    delete:
+      operationId: VectorStoresController_deleteFile
+      summary: Remove a file from vector store
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: file_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File removed from vector store
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreFilesDeleteViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+    get:
+      operationId: VectorStoresController_getFile
+      summary: Retrieves a vector store file.
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: file_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File retrieved from vector store
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/VectorStoreFilesViewModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/ProblemDetailsResponse'
+      tags:
+        - Vector Stores
+
+  /service-accounts:
+    post:
+      operationId: 'ServiceAccountsController_create'
+      summary: 'Create a new service account'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceAccountCreateRequest'
+      responses:
+        '201':
+          description: 'New service account created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccountViewModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Service Accounts'
+
+  /service-accounts/{id}:
+    get:
+      operationId: 'ServiceAccountsController_getById'
+      summary: 'Get service account by id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Service account found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceAccountViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 'Service account not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetailsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Service Accounts'
+
+  /conversational-interface/{id}/signed-url:
+    get:
+      operationId: 'ConversationalInterfaceController_getSignedURL'
+      summary: 'Get conversational interface signed URL'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Signed URL'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedUrlViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Conversational Interface'
+
+  /conversational-interface/{id}:
+    get:
+      operationId: 'ConversationalInterfaceController_getAgent'
+      summary: 'Get conversational interface by id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Conversational interface found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentResponseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Conversational Interface'
+    delete:
+      operationId: 'ConversationalInterfaceController_deleteAgent'
+      summary: 'Delete a conversational interface'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'Conversational interface deleted'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Conversational Interface'
+
+  /conversational-interface:
+    post:
+      operationId: 'ConversationalInterfaceController_createAgent'
+      summary: 'Create a new conversational interface'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentViewModel'
+      responses:
+        '201':
+          description: 'New conversational interface created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentCreationResponseViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Conversational Interface'
+
+  /conversational-interface/{id}/transcriptions:
+    get:
+      operationId: 'ConversationalInterfaceController_getConversationDetails'
+      summary: 'Get conversational interface last transcription by id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Conversation details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetailsViewModel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      tags:
+        - 'Conversational Interface'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: 'http'
+      scheme: 'bearer'
+      bearerFormat: 'JWT'
+  schemas:
+    ProblemDetailsResponse:
+      type: 'object'
+      properties:
+        type:
+          type: 'string'
+        title:
+          type: 'string'
+        detail:
+          type: 'array'
+          items:
+            type: 'string'
+        status:
+          type: 'number'
+        instance:
+          type: 'string'
+      required:
+        - 'type'
+        - 'title'
+        - 'detail'
+        - 'status'
+        - 'instance'
+    ChatCompletionRequest:
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        model:
+          type: string
+        stream:
+          type: 'boolean'
+      required:
+        - messages
+        - model
+    ChatMessage:
+      type: object
+      properties:
+        role:
+          type: string
+        content:
+          type: string
+      required:
+        - role
+        - content
+    ChatCompletionResponse:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        object:
+          type: 'string'
+        created:
+          type: 'integer'
+        model:
+          type: 'string'
+        choices:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/ChatCompletionChoice'
+      required:
+        - 'id'
+        - 'object'
+        - 'created'
+        - 'model'
+        - 'choices'
+    ChatCompletionChoice:
+      type: 'object'
+      properties:
+        index:
+          type: 'integer'
+        message:
+          $ref: '#/components/schemas/ChatMessage'
+      required:
+        - 'index'
+        - 'message'
+
+    EmbeddingRequest:
+      type: 'object'
+      properties:
+        input:
+          oneOf:
+            - type: 'string'
+            - type: 'array'
+              items:
+                type: 'string'
+        model:
+          type: 'string'
+      required:
+        - 'input'
+        - 'model'
+
+    EmbeddingResponse:
+      type: 'object'
+      properties:
+        data:
+          type: 'array'
+          items:
+            type: 'object'
+            properties:
+              embedding:
+                type: 'array'
+                items:
+                  type: 'number'
+              index:
+                type: 'integer'
+            required:
+              - 'embedding'
+              - 'index'
+        model:
+          type: 'string'
+        usage:
+          type: 'object'
+          properties:
+            prompt_tokens:
+              type: 'integer'
+            total_tokens:
+              type: 'integer'
+          required:
+            - 'prompt_tokens'
+            - 'total_tokens'
+      required:
+        - 'data'
+        - 'model'
+        - 'usage'
+
+    AudioSpeechRequest:
+      type: 'object'
+      properties:
+        input:
+          type: 'string'
+        model:
+          type: 'string'
+        voice:
+          type: 'string'
+      required:
+        - 'input'
+        - 'model'
+        - 'voice'
+
+    ImageGenerationRequest:
+      type: 'object'
+      properties:
+        model:
+          type: 'string'
+        prompt:
+          type: 'string'
+        n:
+          type: 'integer'
+          default: 1
+        size:
+          type: 'string'
+          default: '1024x1024'
+      required:
+        - 'prompt'
+        - 'model'
+
+    ImageGenerationV1Request:
+      type: 'object'
+      properties:
+        model:
+          type: 'string'
+        prompt:
+          type: 'string'
+        n:
+          type: 'integer'
+          default: 1
+        size:
+          type: 'string'
+          default: '1024x1024'
+      required:
+        - 'model'
+        - 'prompt'
+
+    HealthCheckResponse:
+      type: 'object'
+      properties:
+        status:
+          type: 'string'
+          example: 'ok'
+        info:
+          type: 'object'
+          nullable: true
+        error:
+          type: 'object'
+          nullable: true
+        details:
+          type: 'object'
+
+    HealthCheckErrorResponse:
+      type: 'object'
+      properties:
+        status:
+          type: 'string'
+          example: 'error'
+        info:
+          type: 'object'
+          nullable: true
+        error:
+          type: 'object'
+          nullable: true
+        details:
+          type: 'object'
+
+    ThreadRunRequest:
+      type: 'object'
+      properties:
+        assistant_id:
+          type: 'string'
+        thread:
+          type: 'object'
+          properties:
+            messages:
+              type: 'array'
+              items:
+                $ref: '#/components/schemas/ChatMessage'
+        stream:
+          type: 'boolean'
+      required:
+        - 'assistant_id'
+        - 'thread'
+
+    ThreadRunResponse:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        object:
+          type: 'string'
+        created_at:
+          type: 'integer'
+        assistant_id:
+          type: 'string'
+        thread_id:
+          type: 'string'
+        status:
+          type: 'string'
+        started_at:
+          type: integer
+          nullable: true
+        expires_at:
+          type: integer
+          nullable: true
+        cancelled_at:
+          type: integer
+          nullable: true
+        failed_at:
+          type: integer
+          nullable: true
+        completed_at:
+          type: integer
+          nullable: true
+        model:
+          type: 'string'
+        tools:
+          type: 'array'
+          items:
+            type: 'object'
+
+    OrganizationViewModel:
+      type: 'object'
+      properties:
+        active:
+          type: 'boolean'
+        maxBudget:
+          type: 'number'
+        maxUsers:
+          type: 'number'
+        models:
+          type: 'array'
+          items:
+            type: 'string'
+        name:
+          type: 'string'
+        id:
+          type: 'string'
+        termsAndConditions:
+          type: 'boolean'
+      required:
+        - 'active'
+        - 'maxBudget'
+        - 'maxUsers'
+        - 'models'
+        - 'name'
+        - 'id'
+        - 'termsAndConditions'
+
+    CopilotMessageViewModel:
+      type: 'object'
+      properties:
+        role:
+          type: 'string'
+        content:
+          type: 'string'
+      required:
+        - 'role'
+        - 'content'
+
+    CopilotGenerationViewModel:
+      type: 'object'
+      properties:
+        messages:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/CopilotMessageViewModel'
+      required:
+        - 'messages'
+
+    KnowledgeBaseUpsertViewModel:
+      type: 'object'
+      properties:
+        name:
+          type: 'string'
+        scope:
+          type: 'string'
+      required:
+        - 'name'
+        - 'scope'
+
+    KnowledgeBaseViewModel:
+      type: 'object'
+      properties:
+        knowledgeBaseId:
+          type: 'string'
+        name:
+          type: 'string'
+        scope:
+          type: 'string'
+      required:
+        - 'knowledgeBaseId'
+        - 'name'
+        - 'scope'
+
+    KnowledgeBaseSearchViewModel:
+      type: 'object'
+      properties:
+        knowledgeBaseId:
+          type: 'array'
+          items:
+            type: 'string'
+        query:
+          type: 'string'
+        searchType:
+          type: 'string'
+          enum: ['bm25', 'vector']
+        topK:
+          type: 'number'
+        filters:
+          type: 'object'
+        returnVector:
+          type: 'boolean'
+      required:
+        - 'knowledgeBaseId'
+        - 'query'
+        - 'searchType'
+        - 'topK'
+        - 'filters'
+        - 'returnVector'
+
+    KnowledgeBaseSearchResponseViewModel:
+      type: 'object'
+      properties:
+        text:
+          type: 'number'
+        metadata:
+          type: 'object'
+        similarityScore:
+          type: 'number'
+        id:
+          type: 'string'
+        knowledgeBaseId:
+          type: 'string'
+      required:
+        - 'text'
+        - 'metadata'
+        - 'similarityScore'
+        - 'id'
+        - 'knowledgeBaseId'
+
+    DocumentsViewModel:
+      type: 'object'
+      properties:
+        knowledgeBaseId:
+          type: 'string'
+        status:
+          type: 'string'
+        userId:
+          type: 'string'
+        organizationId:
+          type: 'string'
+        filePath:
+          type: 'string'
+        fileSize:
+          type: 'string'
+        md5Hash:
+          type: 'string'
+        numChunks:
+          type: 'number'
+        contentType:
+          type: 'string'
+        embeddingModel:
+          type: 'string'
+      required:
+        - 'knowledgeBaseId'
+        - 'status'
+        - 'userId'
+        - 'organizationId'
+        - 'filePath'
+        - 'fileSize'
+        - 'md5Hash'
+        - 'numChunks'
+        - 'contentType'
+        - 'embeddingModel'
+
+    FilesCreateViewModel:
+      type: object
+      properties:
+        purpose:
+          type: string
+          enum:
+            - vision
+            - assistants
+        alias_id:
+          type: string
+        file:
+          type: string
+          format: binary
+      required:
+        - purpose
+        - file
+    FilesViewModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The file identifier, which can be referenced in the API endpoints.
+          example: file-abc123
+        alias_id:
+          type: string
+          description: Non-unique alias file identifier
+          example: alias-abc123
+        object:
+          type: string
+          description: The object type, which is always file.
+          example: file
+        bytes:
+          type: number
+          description: The size of the file, in bytes.
+          example: 120000
+        created_at:
+          type: number
+          description: The Unix timestamp (in seconds) for when the file was created.
+          example: 1677610602
+        filename:
+          type: string
+          description: The name of the file.
+          example: file.pdf
+        purpose:
+          type: string
+          description: The intended purpose of the file.
+          example: assistants
+          enum:
+            - vision
+            - assistants
+      required:
+        - id
+        - object
+        - bytes
+        - created_at
+        - filename
+        - purpose
+    FilesViewModelList:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The object type, which is always list.
+          example: list
+        data:
+          description: The list of files.
+          type: array
+          items:
+            '$ref': '#/components/schemas/FilesViewModel'
+      required:
+        - object
+        - data
+    FilesDeleteModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The file identifier, which can be referenced in the API endpoints.
+          example: file-abc123
+        object:
+          type: string
+          description: The object type, which is always file.
+          example: file
+        deleted:
+          type: boolean
+          description: Deletion Status
+          example: true
+      required:
+        - id
+        - object
+        - deleted
+    VectorStoreViewModel:
+      type: object
+      properties:
+        id:
+          type: string
+        created_at:
+          type: number
+        name:
+          type: string
+        file_counts:
+          type: object
+          properties:
+            in_progress:
+              type: number
+            completed:
+              type: number
+            failed:
+              type: number
+            cancelled:
+              type: number
+            total:
+              type: number
+      required:
+        - id
+        - created_at
+        - name
+        - file_counts
+    VectorStoreViewModelList:
+      type: object
+      properties:
+        object:
+          type: string
+          description: The object type, which is always list.
+          example: list
+        data:
+          description: The list of vector stores.
+          type: array
+          items:
+            '$ref': '#/components/schemas/VectorStoreViewModel'
+        first_id:
+          type: string
+          description: The first vector store id.
+        last_id:
+          type: string
+          description: The last vector store id.
+        has_more:
+          type: boolean
+          description: Whether there are more vector stores to fetch.
+          example: false
+      required:
+        - object
+        - data
+        - first_id
+        - last_id
+        - has_more
+    VectorStoreDeleteViewModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The vector store identifier, which can be referenced in the
+            API endpoints.
+          example: kb-abc123
+        object:
+          type: string
+          description: The object type, which is always vector-store.
+          example: vector-store
+        deleted:
+          type: boolean
+          description: Deletion Status
+          example: true
+      required:
+        - id
+        - object
+        - deleted
+    VectorStoreFilesDeleteViewModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The vector store file identifier, which can be referenced in
+            the API endpoints.
+          example: file-abc123
+        object:
+          type: string
+          description: The object type, which is always vector-store.file
+          example: vector-store.file
+        deleted:
+          type: boolean
+          description: Deletion Status
+          example: true
+      required:
+        - id
+        - object
+        - deleted
+    VectorStoreFilesViewModel:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        usage_bytes:
+          type: number
+        created_at:
+          type: number
+        vector_store_id:
+          type: string
+        status:
+          type: string
+          enum:
+            - in_progress
+            - completed
+            - failed
+        last_error:
+          type: object
+        chunking_strategy:
+          type: object
+      required:
+        - id
+        - object
+        - usage_bytes
+        - created_at
+        - vector_store_id
+        - status
+        - last_error
+        - chunking_strategy
+    VectorStoreFilesViewModelList:
+      type: object
+      properties:
+        object:
+          type: string
+        data:
+          type: array
+          items:
+            '$ref': '#/components/schemas/VectorStoreFilesViewModel'
+        first_id:
+          type: string
+          description: The first vector store id.
+        last_id:
+          type: string
+          description: The last vector store id.
+        has_more:
+          type: boolean
+          description: Whether there are more vector stores to fetch.
+          example: false
+      required:
+        - object
+        - data
+        - first_id
+        - last_id
+        - has_more
+
+    ServiceAccountCreateRequest:
+      type: 'object'
+      properties:
+        permissions:
+          type: 'array'
+          items:
+            type: 'string'
+      required:
+        - 'permissions'
+
+    ServiceAccountViewModel:
+      type: 'object'
+      properties:
+        serviceAccountId:
+          type: 'string'
+        organizationId:
+          type: 'string'
+        permissions:
+          type: 'array'
+          items:
+            type: 'string'
+        createdAt:
+          type: 'string'
+          format: 'date-time'
+        createdBy:
+          type: 'string'
+      required:
+        - 'serviceAccountId'
+        - 'organizationId'
+        - 'permissions'
+        - 'createdAt'
+        - 'createdBy'
+
+    SignedUrlViewModel:
+      type: 'object'
+      properties:
+        signedUrl:
+          type: 'string'
+      required:
+        - 'signedUrl'
+
+    AgentPromptViewModel:
+      type: 'object'
+      properties:
+        customLlm:
+          type: 'string'
+        knowledgeBase:
+          type: 'array'
+          items:
+            type: 'string'
+        llm:
+          type: 'string'
+        maxTokens:
+          type: 'number'
+        prompt:
+          type: 'string'
+        temperature:
+          type: 'number'
+        tools:
+          type: 'array'
+          items:
+            type: 'string'
+      required:
+        - 'customLlm'
+        - 'knowledgeBase'
+        - 'llm'
+        - 'maxTokens'
+        - 'prompt'
+        - 'temperature'
+        - 'tools'
+
+    AgentViewModel:
+      type: 'object'
+      properties:
+        server:
+          type: 'string'
+        prompt:
+          $ref: '#/components/schemas/AgentPromptViewModel'
+        firstMessage:
+          type: 'string'
+        language:
+          type: 'string'
+      required:
+        - 'server'
+        - 'prompt'
+        - 'firstMessage'
+        - 'language'
+
+    AsrViewModel:
+      type: 'object'
+      properties:
+        quality:
+          type: 'string'
+        provider:
+          type: 'string'
+        userInputAudioFormat:
+          type: 'string'
+        keywords:
+          type: 'array'
+          items:
+            type: 'string'
+      required:
+        - 'quality'
+        - 'provider'
+        - 'userInputAudioFormat'
+        - 'keywords'
+
+    TurnViewModel:
+      type: 'object'
+      properties:
+        turnTimeout:
+          type: 'number'
+      required:
+        - 'turnTimeout'
+
+    TtsViewModel:
+      type: 'object'
+      properties:
+        modelId:
+          type: 'string'
+        voiceId:
+          type: 'string'
+        agentOutputAudioFormat:
+          type: 'string'
+        optimizeStreamingLatency:
+          type: 'number'
+        stability:
+          type: 'number'
+        similarityBoost:
+          type: 'number'
+      required:
+        - 'modelId'
+        - 'voiceId'
+        - 'agentOutputAudioFormat'
+        - 'optimizeStreamingLatency'
+        - 'stability'
+        - 'similarityBoost'
+
+    ConversationViewModel:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        conversationalInterfaceId:
+          type: 'string'
+        timestamp:
+          type: 'number'
+      required:
+        - 'id'
+        - 'conversationalInterfaceId'
+        - 'timestamp'
+
+    ConversationConfigViewModel:
+      type: 'object'
+      properties:
+        agent:
+          $ref: '#/components/schemas/AgentViewModel'
+        asr:
+          $ref: '#/components/schemas/AsrViewModel'
+        turn:
+          $ref: '#/components/schemas/TurnViewModel'
+        tts:
+          $ref: '#/components/schemas/TtsViewModel'
+        conversation:
+          $ref: '#/components/schemas/ConversationViewModel'
+      required:
+        - 'agent'
+        - 'asr'
+        - 'turn'
+        - 'tts'
+        - 'conversation'
+
+    AuthViewModel:
+      type: 'object'
+      properties:
+        enableAuth:
+          type: 'boolean'
+      required:
+        - 'enableAuth'
+
+    EvaluationCriterionViewModel:
+      type: 'object'
+      properties:
+        id:
+          type: 'string'
+        name:
+          type: 'string'
+        type:
+          type: 'string'
+        conversationGoalPrompt:
+          type: 'string'
+      required:
+        - 'id'
+        - 'name'
+        - 'type'
+        - 'conversationGoalPrompt'
+
+    EvaluationViewModel:
+      type: 'object'
+      properties:
+        criteria:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/EvaluationCriterionViewModel'
+      required:
+        - 'criteria'
+
+    WidgetAvatarViewModel:
+      type: 'object'
+      properties:
+        type:
+          type: 'string'
+        color1:
+          type: 'string'
+        color2:
+          type: 'string'
+      required:
+        - 'type'
+        - 'color1'
+        - 'color2'
+
+    WidgetViewModel:
+      type: 'object'
+      properties:
+        variant:
+          type: 'string'
+        avatar:
+          $ref: '#/components/schemas/WidgetAvatarViewModel'
+        customAvatarPath:
+          type: 'string'
+        bgColor:
+          type: 'string'
+        textColor:
+          type: 'string'
+        btnColor:
+          type: 'string'
+        btnTextColor:
+          type: 'string'
+        borderColor:
+          type: 'string'
+        focusColor:
+          type: 'string'
+        borderRadius:
+          type: 'number'
+        btnRadius:
+          type: 'number'
+        actionText:
+          type: 'string'
+        startCallText:
+          type: 'string'
+        endCallText:
+          type: 'string'
+        expandText:
+          type: 'string'
+        listeningText:
+          type: 'string'
+        speakingText:
+          type: 'string'
+      required:
+        - 'variant'
+        - 'avatar'
+        - 'customAvatarPath'
+        - 'bgColor'
+        - 'textColor'
+        - 'btnColor'
+        - 'btnTextColor'
+        - 'borderColor'
+        - 'focusColor'
+        - 'borderRadius'
+        - 'btnRadius'
+        - 'actionText'
+        - 'startCallText'
+        - 'endCallText'
+        - 'expandText'
+        - 'listeningText'
+        - 'speakingText'
+
+    PlatformSettingsViewModel:
+      type: 'object'
+      properties:
+        auth:
+          $ref: '#/components/schemas/AuthViewModel'
+        evaluation:
+          $ref: '#/components/schemas/EvaluationViewModel'
+        widget:
+          $ref: '#/components/schemas/WidgetViewModel'
+        dataCollection:
+          type: 'object'
+      required:
+        - 'auth'
+        - 'evaluation'
+        - 'widget'
+        - 'dataCollection'
+
+    AgentResponseViewModel:
+      type: 'object'
+      properties:
+        conversationConfig:
+          $ref: '#/components/schemas/ConversationConfigViewModel'
+        platformSettings:
+          $ref: '#/components/schemas/PlatformSettingsViewModel'
+        name:
+          type: 'string'
+        conversationalInterfaceId:
+          type: 'string'
+      required:
+        - 'conversationConfig'
+        - 'platformSettings'
+        - 'name'
+        - 'conversationalInterfaceId'
+
+    CreateAgentViewModel:
+      type: 'object'
+      properties:
+        conversationConfig:
+          $ref: '#/components/schemas/ConversationConfigViewModel'
+        platformSettings:
+          $ref: '#/components/schemas/PlatformSettingsViewModel'
+        name:
+          type: 'string'
+      required:
+        - 'conversationConfig'
+        - 'platformSettings'
+        - 'name'
+
+    AgentCreationResponseViewModel:
+      type: 'object'
+      properties:
+        conversationalInterfaceId:
+          type: 'string'
+      required:
+        - 'conversationalInterfaceId'
+
+    ConversationMessageViewModel:
+      type: 'object'
+      properties:
+        role:
+          type: 'string'
+        message:
+          type: 'string'
+        timeInCallSecs:
+          type: 'number'
+      required:
+        - 'role'
+        - 'message'
+        - 'timeInCallSecs'
+
+    ConversationDetailsViewModel:
+      type: 'object'
+      properties:
+        conversationalInterfaceId:
+          type: 'string'
+        conversationId:
+          type: 'string'
+        status:
+          type: 'string'
+        transcript:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/ConversationMessageViewModel'
+      required:
+        - 'conversationalInterfaceId'
+        - 'conversationId'
+        - 'status'
+        - 'transcript'
+
+  responses:
+    BadRequest:
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsResponse'
+
+    Unauthorized:
+      description: 'Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsResponse'
+
+    InternalServerError:
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetailsResponse'
+
+tags:
+  - name: 'Chat Completions'
+    description: 'Chat completion operations'
+  - name: 'Audio Transcriptions'
+    description: 'Audio transcription operations'
+  - name: 'Embeddings'
+    description: 'Embedding operations'
+  - name: 'Image Generations'
+    description: 'Image generation operations'
+  - name: 'Audio Speech'
+    description: 'Audio speech operations'
+  - name: 'Health'
+    description: 'Health check operations'
+  - name: 'Organizations'
+    description: 'Organization management'
+  - name: 'Knowledge Bases'
+    description: 'Knowledge base operations'
+  - name: 'Files'
+    description: 'File management operations'
+  - name: 'Vector Stores'
+    description: 'Vector store operations'
+  - name: 'Service Accounts'
+    description: 'Service account management'
+  - name: 'Conversational Interface'
+    description: 'Conversational interface operations'

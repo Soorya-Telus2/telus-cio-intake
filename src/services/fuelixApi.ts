@@ -50,6 +50,7 @@ Please analyze the provided data against the acceptance criteria and provide:
 2. Specific suggestions for improvement
 3. A completeness score (0-100)
 4. Any missing or unclear information
+5. Whether this appears to overlap with any existing TELUS initiatives or projects
 
 Respond in JSON format:
 {

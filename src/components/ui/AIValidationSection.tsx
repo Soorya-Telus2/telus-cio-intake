@@ -30,7 +30,7 @@ export const AIValidationSection: React.FC<AIValidationSectionProps> = ({
   return (
     <div className="border-t border-gray-200 pt-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">AI Validation</h3>
+        <h3 className="text-lg font-medium text-gray-900">AI Validation (Custom TELUS CIO Copilot)</h3>
         <div className="flex space-x-2">
           {showTestButton && (
             <Button

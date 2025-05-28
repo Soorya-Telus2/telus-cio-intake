@@ -3,6 +3,7 @@ import { AIFeedbackResponse } from '../types/form';
 
 const FUELIX_API_BASE = process.env.REACT_APP_FUELIX_API_URL || 'https://api-beta.fuelix.ai';
 const COPILOT_ID = process.env.REACT_APP_FUELIX_COPILOT_ID || '';
+const CUSTOM_COPILOT_ID = process.env.REACT_APP_FUELIX_CUSTOM_COPILOT_ID || 'copilot-Y0AeZyizqWIisRthiBDV';
 const API_KEY = process.env.REACT_APP_FUELIX_API_KEY || '';
 
 const fuelixApi = axios.create({
@@ -317,4 +318,318 @@ Format the response as a well-structured document with clear headings and profes
     console.error('Error generating project briefing:', error);
     return 'Project briefing generation is temporarily unavailable.';
   }
+};
+
+// ===== CUSTOM COPILOT FUNCTIONS =====
+
+/**
+ * Validate section using custom TELUS CIO copilot with fallback to general AI
+ */
+export const validateSectionWithCustomCopilot = async (
+  sectionName: string,
+  sectionData: any,
+  acceptanceCriteria: string[]
+): Promise<AIFeedbackResponse> => {
+  console.log('🤖 Attempting validation with custom TELUS CIO copilot...');
+  
+  try {
+    // First, try the custom copilot
+    const customResult = await validateWithCustomCopilotOnly(sectionName, sectionData, acceptanceCriteria);
+    console.log('✅ Custom copilot validation successful');
+    return customResult;
+  } catch (customError) {
+    console.warn('⚠️ Custom copilot failed, falling back to general AI:', customError);
+    
+    // Fallback to existing general AI validation
+    try {
+      const fallbackResult = await validateSectionWithAI(sectionName, sectionData, acceptanceCriteria);
+      console.log('✅ Fallback to general AI successful');
+      
+      // Add a note that fallback was used
+      return {
+        ...fallbackResult,
+        feedback: `${fallbackResult.feedback}\n\n(Note: Using general AI - custom copilot temporarily unavailable)`
+      };
+    } catch (fallbackError) {
+      console.error('❌ Both custom copilot and fallback failed:', fallbackError);
+      
+      // Return a basic response if everything fails
+      return {
+        feedback: 'AI validation is temporarily unavailable. Please review your responses manually against the acceptance criteria.',
+        suggestions: ['Ensure all required fields are completed', 'Provide specific, measurable details'],
+        completenessScore: 50,
+        improvements: ['Review acceptance criteria for this section']
+      };
+    }
+  }
+};
+
+/**
+ * Core function to validate using only the custom copilot (no fallback)
+ */
+const validateWithCustomCopilotOnly = async (
+  sectionName: string,
+  sectionData: any,
+  acceptanceCriteria: string[]
+): Promise<AIFeedbackResponse> => {
+  if (!API_KEY) {
+    throw new Error('API_KEY is not configured');
+  }
+
+  if (!CUSTOM_COPILOT_ID) {
+    throw new Error('CUSTOM_COPILOT_ID is not configured');
+  }
+
+  const prompt = `
+You are a specialized AI assistant for TELUS CIO project intake validation. You have deep knowledge of TELUS processes, standards, and requirements.
+
+Section: ${sectionName}
+Data provided: ${JSON.stringify(sectionData, null, 2)}
+
+Acceptance Criteria:
+${acceptanceCriteria.map(criteria => `- ${criteria}`).join('\n')}
+
+Please analyze the provided data against the acceptance criteria and TELUS CIO standards. Provide:
+1. Overall feedback on completeness and quality
+2. Specific suggestions for improvement aligned with TELUS processes
+3. A completeness score (0-100)
+4. Any missing or unclear information
+
+Respond in JSON format:
+{
+  "feedback": "Overall assessment of the section",
+  "suggestions": ["specific suggestion 1", "specific suggestion 2"],
+  "completenessScore": 85,
+  "improvements": ["improvement 1", "improvement 2"]
+}
+`;
+
+  const requestPayload = {
+    assistant_id: CUSTOM_COPILOT_ID,
+    thread: {
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]
+    },
+    stream: false
+  };
+
+  console.log('Making request to custom copilot:', `${FUELIX_API_BASE}/v1/threads/runs`);
+  console.log('Custom copilot ID:', CUSTOM_COPILOT_ID);
+  console.log('Request payload:', JSON.stringify(requestPayload, null, 2));
+
+  const response = await fuelixApi.post('/v1/threads/runs', requestPayload);
+
+  console.log('Custom copilot response:', response.data);
+
+  // Extract the assistant's response from the thread run
+  let aiResponse: string = '';
+  
+  // Handle different possible response formats from threads/runs
+  if (response.data?.messages && Array.isArray(response.data.messages)) {
+    // Find the assistant's message
+    const assistantMessage = response.data.messages.find((msg: any) => msg.role === 'assistant');
+    if (assistantMessage?.content) {
+      aiResponse = assistantMessage.content;
+    }
+  } else if (response.data?.content) {
+    aiResponse = response.data.content;
+  } else if (response.data?.choices?.[0]?.message?.content) {
+    // Fallback to chat completion format
+    aiResponse = response.data.choices[0].message.content;
+  } else if (typeof response.data === 'string') {
+    aiResponse = response.data;
+  } else {
+    // If we can't find the response, throw an error to trigger fallback
+    throw new Error('Unable to extract response from custom copilot');
+  }
+
+  // Parse the JSON response
+  try {
+    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsedResponse = JSON.parse(jsonMatch[0]);
+      return parsedResponse;
+    } else {
+      // If no JSON found, create a structured response
+      return {
+        feedback: aiResponse,
+        suggestions: [],
+        completenessScore: 75,
+        improvements: []
+      };
+    }
+  } catch (parseError) {
+    console.error('Error parsing custom copilot response:', parseError);
+    // Return a structured response even if parsing fails
+    return {
+      feedback: aiResponse || 'Custom copilot provided feedback but format was unclear.',
+      suggestions: ['Please review your responses for completeness'],
+      completenessScore: 60,
+      improvements: ['Consider adding more detail to your responses']
+    };
+  }
+};
+
+/**
+ * Test custom copilot connection
+ */
+export const testCustomCopilotConnection = async (): Promise<{ success: boolean; message: string; details?: any }> => {
+  try {
+    console.log('Testing custom TELUS CIO copilot connection...');
+    
+    if (!API_KEY) {
+      return { success: false, message: 'API key is not configured' };
+    }
+
+    if (!CUSTOM_COPILOT_ID) {
+      return { success: false, message: 'Custom copilot ID is not configured' };
+    }
+
+    const testPayload = {
+      assistant_id: CUSTOM_COPILOT_ID,
+      thread: {
+        messages: [
+          {
+            role: 'user',
+            content: 'Hello, this is a test message for the TELUS CIO copilot. Please respond with "Custom copilot test successful" and confirm you are ready to help with project intake validation.'
+          }
+        ]
+      },
+      stream: false
+    };
+
+    console.log('Testing custom copilot endpoint:', `${FUELIX_API_BASE}/v1/threads/runs`);
+    console.log('Custom copilot ID:', CUSTOM_COPILOT_ID);
+    
+    const response = await fuelixApi.post('/v1/threads/runs', testPayload);
+    
+    return {
+      success: true,
+      message: `Custom TELUS CIO copilot connection successful (ID: ${CUSTOM_COPILOT_ID})`,
+      details: {
+        status: response.status,
+        assistantId: CUSTOM_COPILOT_ID,
+        data: response.data
+      }
+    };
+  } catch (error: any) {
+    console.error('Custom copilot test error:', error);
+    
+    let message = 'Custom copilot connection failed';
+    if (error.response?.status === 401) {
+      message = 'Authentication failed - invalid API key for custom copilot';
+    } else if (error.response?.status === 404) {
+      message = 'Custom copilot not found - check assistant ID';
+    } else if (error.response?.status === 403) {
+      message = 'Access forbidden - check custom copilot permissions';
+    } else if (error.code === 'ENOTFOUND') {
+      message = 'Network error - cannot reach API server';
+    }
+
+    return {
+      success: false,
+      message,
+      details: {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        assistantId: CUSTOM_COPILOT_ID
+      }
+    };
+  }
+};
+
+/**
+ * Generate project briefing using custom copilot with fallback
+ */
+export const generateProjectBriefingWithCustomCopilot = async (formData: any): Promise<string> => {
+  console.log('📄 Generating project briefing with custom TELUS CIO copilot...');
+  
+  try {
+    // Try custom copilot first
+    const customResult = await generateBriefingWithCustomCopilotOnly(formData);
+    console.log('✅ Custom copilot briefing generation successful');
+    return customResult;
+  } catch (customError) {
+    console.warn('⚠️ Custom copilot briefing failed, falling back to general AI:', customError);
+    
+    // Fallback to existing function
+    try {
+      const fallbackResult = await generateProjectBriefing(formData);
+      return `${fallbackResult}\n\n---\n(Note: Generated using general AI - custom copilot temporarily unavailable)`;
+    } catch (fallbackError) {
+      console.error('❌ Both custom copilot and fallback briefing failed:', fallbackError);
+      return 'Project briefing generation is temporarily unavailable. Please review the form data manually.';
+    }
+  }
+};
+
+/**
+ * Core function to generate briefing using only custom copilot
+ */
+const generateBriefingWithCustomCopilotOnly = async (formData: any): Promise<string> => {
+  if (!API_KEY) {
+    throw new Error('API_KEY is not configured');
+  }
+
+  if (!CUSTOM_COPILOT_ID) {
+    throw new Error('CUSTOM_COPILOT_ID is not configured');
+  }
+
+  const prompt = `
+As a specialized TELUS CIO project analyst, generate a comprehensive project briefing document based on the following project intake form data:
+
+${JSON.stringify(formData, null, 2)}
+
+Create a professional project briefing document that includes:
+1. Executive Summary (tailored for TELUS CIO leadership)
+2. Project Overview (aligned with TELUS strategic priorities)
+3. Business Impact and Justification (using TELUS business metrics)
+4. Technical Requirements (considering TELUS technology stack)
+5. Stakeholder Analysis (TELUS organizational context)
+6. Timeline and Milestones (TELUS project methodology)
+7. Risk Assessment (TELUS risk framework)
+8. Recommendations (TELUS decision criteria)
+
+Format the response as a well-structured document with clear headings and professional language suitable for TELUS CIO executive review. Include specific TELUS context and terminology where appropriate.
+`;
+
+  const requestPayload = {
+    assistant_id: CUSTOM_COPILOT_ID,
+    thread: {
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]
+    },
+    stream: false
+  };
+
+  const response = await fuelixApi.post('/v1/threads/runs', requestPayload);
+
+  // Extract content from response
+  let content = '';
+  if (response.data?.messages && Array.isArray(response.data.messages)) {
+    const assistantMessage = response.data.messages.find((msg: any) => msg.role === 'assistant');
+    if (assistantMessage?.content) {
+      content = assistantMessage.content;
+    }
+  } else if (response.data?.content) {
+    content = response.data.content;
+  } else if (response.data?.choices?.[0]?.message?.content) {
+    content = response.data.choices[0].message.content;
+  } else if (typeof response.data === 'string') {
+    content = response.data;
+  } else {
+    throw new Error('Unable to extract briefing content from custom copilot response');
+  }
+
+  return content || 'Custom copilot generated a briefing but content was not accessible.';
 };

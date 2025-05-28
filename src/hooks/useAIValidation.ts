@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { validateSectionWithAI, testFuelixConnection } from '../services/fuelixApi.ts';
+import { validateSectionWithAI, validateSectionWithCustomCopilot, testFuelixConnection, testCustomCopilotConnection } from '../services/fuelixApi';
 import { AIFeedbackResponse } from '../types/form';
 
 export interface UseAIValidationReturn {
@@ -26,7 +26,8 @@ export const useAIValidation = (
   const validateSection = async () => {
     setIsValidating(true);
     try {
-      const result = await validateSectionWithAI(
+      // Use custom copilot with automatic fallback to general AI
+      const result = await validateSectionWithCustomCopilot(
         sectionName,
         sectionData,
         acceptanceCriteria

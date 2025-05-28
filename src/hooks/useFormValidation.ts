@@ -63,7 +63,7 @@ export const useFormValidation = (formData: FormData): FormValidation => {
       };
     };
 
-    // Funding Status Validation
+    // Funding Status Validation - Fixed to properly handle null values
     const validateFundingStatus = (): SectionValidation => {
       const errors: ValidationError[] = [];
       const { fundingStatus } = formData;
@@ -71,13 +71,25 @@ export const useFormValidation = (formData: FormData): FormValidation => {
       if (fundingStatus.isFunded === undefined || fundingStatus.isFunded === null) {
         errors.push({ field: 'isFunded', message: 'Funding status is required' });
       }
-      if (fundingStatus.isFunded && !fundingStatus.initiativeName?.trim()) {
+      if (fundingStatus.isFunded === true && !fundingStatus.initiativeName?.trim()) {
         errors.push({ field: 'initiativeName', message: 'Initiative name is required when funded' });
       }
 
-      const totalFields = fundingStatus.isFunded ? 2 : 1;
-      const completedFields = totalFields - errors.length;
-      const completionPercentage = (completedFields / totalFields) * 100;
+      // Only count as completed if actually answered (not null)
+      let totalFields = 1; // isFunded question
+      let completedFields = 0;
+      
+      if (fundingStatus.isFunded !== null && fundingStatus.isFunded !== undefined) {
+        completedFields += 1;
+        if (fundingStatus.isFunded === true) {
+          totalFields += 1; // initiativeName becomes required
+          if (fundingStatus.initiativeName?.trim()) {
+            completedFields += 1;
+          }
+        }
+      }
+
+      const completionPercentage = totalFields > 0 ? (completedFields / totalFields) * 100 : 0;
 
       return {
         isValid: errors.length === 0,
@@ -185,7 +197,7 @@ export const useFormValidation = (formData: FormData): FormValidation => {
       };
     };
 
-    // Business Unit Impact Validation
+    // Business Unit Impact Validation - Fixed to properly handle null values
     const validateBusinessUnitImpact = (): SectionValidation => {
       const errors: ValidationError[] = [];
       const { businessUnitImpact } = formData;
@@ -198,7 +210,7 @@ export const useFormValidation = (formData: FormData): FormValidation => {
         errors.push({ field: 'requiresConvergence', message: 'Convergence assessment is required' });
       }
 
-      if (businessUnitImpact.requiresConvergence && !businessUnitImpact.convergenceDescription?.trim()) {
+      if (businessUnitImpact.requiresConvergence === true && !businessUnitImpact.convergenceDescription?.trim()) {
         errors.push({ field: 'convergenceDescription', message: 'Convergence description is required when convergence is needed' });
       }
 
@@ -212,9 +224,25 @@ export const useFormValidation = (formData: FormData): FormValidation => {
         }
       }
 
-      const totalFields = businessUnitImpact.requiresConvergence ? 4 : 3;
-      const completedFields = totalFields - errors.length;
-      const completionPercentage = (completedFields / totalFields) * 100;
+      // Only count convergence field if it's actually answered
+      let totalFields = 2; // impactedUnits + requiresConvergence
+      let completedFields = 0;
+      
+      if (businessUnitImpact.impactedUnits && businessUnitImpact.impactedUnits.length > 0) {
+        completedFields += 1;
+      }
+      
+      if (businessUnitImpact.requiresConvergence !== null && businessUnitImpact.requiresConvergence !== undefined) {
+        completedFields += 1;
+        if (businessUnitImpact.requiresConvergence === true) {
+          totalFields += 1; // convergenceDescription becomes required
+          if (businessUnitImpact.convergenceDescription?.trim()) {
+            completedFields += 1;
+          }
+        }
+      }
+
+      const completionPercentage = totalFields > 0 ? (completedFields / totalFields) * 100 : 0;
 
       return {
         isValid: errors.length === 0,

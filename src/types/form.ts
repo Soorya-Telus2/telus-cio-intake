@@ -10,7 +10,7 @@ export interface FormData {
   
   // Funding and Initiative
   fundingStatus: {
-    isFunded: boolean;
+    isFunded: boolean | null;
     igCode?: string;
     initiativeName: string;
     hasBeenThroughTCT?: boolean;
@@ -48,7 +48,7 @@ export interface FormData {
   businessUnitImpact: {
     impactedUnits: string[];
     primaryUnit?: string;
-    requiresConvergence: boolean;
+    requiresConvergence: boolean | null;
     convergenceDescription?: string;
     impactDescriptions: Array<{
       unit: string;

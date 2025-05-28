@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from '../context/FormContext.tsx';
 import { useFormValidation } from '../hooks/useFormValidation.ts';
+import { submitToFirebase } from '../services/firebaseApi.ts';
 import { Button } from './ui/Button.tsx';
 import { SubmitterInfoSection } from './sections/SubmitterInfoSection.tsx';
 import { FundingStatusSection } from './sections/FundingStatusSection.tsx';
@@ -26,6 +27,7 @@ export const IntakeForm: React.FC = () => {
   const { state, setStep } = useForm();
   const { currentStep } = state;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState<{ success: boolean; submissionId: string; message: string } | null>(null);
   
   // Get validation state
   const validation = useFormValidation(state.formData);
@@ -52,15 +54,33 @@ export const IntakeForm: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    setSubmissionResult(null);
+    
     try {
-      // Here we would submit to Google Sheets
-      console.log('Submitting form data:', state.formData);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert('Form submitted successfully!');
+      console.log('🔥 Submitting form to Firebase...', state.formData);
+      
+      // Submit to Firebase
+      const result = await submitToFirebase(state.formData);
+      
+      setSubmissionResult(result);
+      
+      if (result.success) {
+        // Show success message with submission ID
+        alert(`✅ ${result.message}\n\nSubmission ID: ${result.submissionId}\n\nYour submission has been recorded and the team will review it shortly.`);
+      } else {
+        // Show error message
+        alert(`❌ ${result.message}\n\nPlease try again or contact support if the problem persists.`);
+      }
+      
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('Error submitting form. Please try again.');
+      const errorMessage = 'An unexpected error occurred while submitting your form. Please try again or contact support.';
+      setSubmissionResult({
+        success: false,
+        submissionId: '',
+        message: errorMessage
+      });
+      alert(`❌ ${errorMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,6 +100,33 @@ export const IntakeForm: React.FC = () => {
 
   return (
     <div className="p-8">
+      {/* Submission Success Message */}
+      {submissionResult?.success && (
+        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-green-800">
+                Form Submitted Successfully!
+              </h3>
+              <div className="mt-2 text-sm text-green-700">
+                <p>
+                  <strong>Submission ID:</strong> {submissionResult.submissionId}
+                </p>
+                <p className="mt-1">
+                  Your project intake request has been submitted and saved to our Firebase database. 
+                  The TELUS CIO team will review your submission and contact you within 2-3 business days.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Overall Progress Indicator */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">

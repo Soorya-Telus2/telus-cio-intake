@@ -25,7 +25,7 @@ const initialFormData: FormData = {
     department: ''
   },
   fundingStatus: {
-    isFunded: false,
+    isFunded: null,
     initiativeName: ''
   },
   objective: {
@@ -49,7 +49,7 @@ const initialFormData: FormData = {
   },
   businessUnitImpact: {
     impactedUnits: [],
-    requiresConvergence: false,
+    requiresConvergence: null,
     impactDescriptions: []
   },
   customerImpact: {

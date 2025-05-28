@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from '../../context/FormContext.tsx';
 import { useFormValidation } from '../../hooks/useFormValidation.ts';
 import { Button } from '../ui/Button.tsx';
+import { downloadBasicProjectBriefing } from '../../services/basicPdfGenerator.ts';
 
 export const ReviewSection: React.FC = () => {
   const { state, setStep } = useForm();
   const { formData } = state;
   const validation = useFormValidation(formData);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const sections = [
     { title: 'Submitter Information', stepIndex: 0, validation: validation.sections.submitterInfo },
@@ -20,6 +22,19 @@ export const ReviewSection: React.FC = () => {
 
   const handleGoToSection = (stepIndex: number) => {
     setStep(stepIndex);
+  };
+
+  const handleDownloadPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      const submissionId = `TEMP-${Date.now()}`;
+      downloadBasicProjectBriefing(formData, submissionId);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -38,6 +53,38 @@ export const ReviewSection: React.FC = () => {
             className="bg-telus-purple h-3 rounded-full transition-all duration-300"
             style={{ width: `${validation.overallCompletionPercentage}%` }}
           ></div>
+        </div>
+      </div>
+
+      {/* PDF Download Section */}
+      <div className="bg-telus-purple/5 border border-telus-purple/20 rounded-lg p-6">
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-telus-purple" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3 flex-1">
+            <h3 className="text-sm font-medium text-telus-purple">
+              Download Project Briefing
+            </h3>
+            <div className="mt-2 text-sm text-gray-700">
+              <p>
+                Generate a PDF summary of your project intake form. This document contains all the information you've provided and can be shared with stakeholders or saved for your records.
+              </p>
+            </div>
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                onClick={handleDownloadPdf}
+                loading={isGeneratingPdf}
+                disabled={isGeneratingPdf}
+                className="text-telus-purple border-telus-purple hover:bg-telus-purple hover:text-white"
+              >
+                {isGeneratingPdf ? 'Generating PDF...' : 'Download PDF Briefing'}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 

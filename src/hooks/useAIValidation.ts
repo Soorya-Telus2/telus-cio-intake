@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { validateSectionWithAI, validateSectionWithCustomCopilot, testFuelixConnection, testCustomCopilotConnection } from '../services/fuelixApi';
+import { validateSectionWithCustomCopilot, testFuelixConnection } from '../services/fuelixApi.ts';
 import { AIFeedbackResponse } from '../types/form';
 
 export interface UseAIValidationReturn {
